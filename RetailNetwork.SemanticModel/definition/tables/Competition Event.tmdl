@@ -1,0 +1,87 @@
+/// Fact: 131 stores where a competitor opened nearby during the data window. Impact = store change vs network change (difference in differences), 90 days before vs days 30-150 after.
+table 'Competition Event'
+	lineageTag: 7045c5d3-ff62-4cb6-9275-4451e5f22dfe
+
+	column StoreKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e04ede81-5282-4a91-b585-5cda7999ddea
+		summarizeBy: none
+		sourceColumn: StoreKey
+
+	column CompetitorOpened
+		dataType: dateTime
+		formatString: mmm yyyy
+		lineageTag: 6941c879-9c88-4160-8d06-d26d248a3e45
+		summarizeBy: none
+		sourceColumn: CompetitorOpened
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column PreDailySales
+		dataType: double
+		isHidden
+		formatString: #,0
+		lineageTag: 0abd090b-a5ee-4b73-86db-8385330892f8
+		summarizeBy: none
+		sourceColumn: PreDailySales
+
+	column PostDailySales
+		dataType: double
+		isHidden
+		formatString: #,0
+		lineageTag: 6d7c5df4-9325-4de0-a720-0984081eccdc
+		summarizeBy: none
+		sourceColumn: PostDailySales
+
+	column StoreChange
+		dataType: double
+		isHidden
+		formatString: 0.0%
+		lineageTag: 2cf48559-8489-47a5-b866-47e42d061abf
+		summarizeBy: none
+		sourceColumn: StoreChange
+
+	column NetworkChange
+		dataType: double
+		isHidden
+		formatString: 0.0%
+		lineageTag: 2c15c985-3ae6-4372-b676-0714ae041c9d
+		summarizeBy: none
+		sourceColumn: NetworkChange
+
+	column ImpactPct
+		dataType: double
+		isHidden
+		formatString: 0.0%
+		lineageTag: 8473b600-0351-4e05-b531-d3c06493e473
+		summarizeBy: none
+		sourceColumn: ImpactPct
+
+	column ImpactBand
+		dataType: string
+		lineageTag: dd778f35-4c16-4ddb-bc0e-db19c647991e
+		summarizeBy: none
+		sourceColumn: ImpactBand
+		sortByColumn: ImpactBandOrder
+
+	column ImpactBandOrder
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9463cc4f-77a8-469d-84cb-dd6be4ad92fd
+		summarizeBy: none
+		sourceColumn: ImpactBandOrder
+
+	partition 'Competition Event' = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("fact_competition_event.csv"),
+				    Typed = Table.TransformColumnTypes(Source, {{"StoreKey", Int64.Type}, {"CompetitorOpened", type date}, {"PreDailySales", type number}, {"PostDailySales", type number}, {"StoreChange", type number}, {"NetworkChange", type number}, {"ImpactPct", type number}, {"ImpactBand", type text}, {"ImpactBandOrder", Int64.Type}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

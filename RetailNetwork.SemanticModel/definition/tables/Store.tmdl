@@ -1,0 +1,98 @@
+/// 1,115 drugstores across 12 German federal states.
+table Store
+	lineageTag: 1b42860e-be84-489d-b853-aa652b08ed92
+
+	column StoreKey
+		dataType: int64
+		isHidden
+		isKey
+		formatString: 0
+		lineageTag: c28712b0-089f-4dc8-b3f4-2d7761065e31
+		summarizeBy: none
+		sourceColumn: StoreKey
+
+	column StoreName
+		dataType: string
+		lineageTag: e62e8807-9f21-4936-a5a8-cb7eeb2487c9
+		summarizeBy: none
+		sourceColumn: StoreName
+
+	column State
+		dataType: string
+		isHidden
+		lineageTag: 4c5bed78-777a-4c83-86d1-3e0e053f76ec
+		summarizeBy: none
+		sourceColumn: State
+
+	/// Federal state
+	column StateName
+		dataType: string
+		lineageTag: 33516f23-a108-4230-a8bd-7ce024dab5f9
+		summarizeBy: none
+		sourceColumn: StateName
+
+	column StateGeo
+		dataType: string
+		isHidden
+		lineageTag: 78a72b48-af6a-45d7-9a0d-0bd0f248aa00
+		dataCategory: StateOrProvince
+		summarizeBy: none
+		sourceColumn: StateGeo
+
+	/// Store format (A-D as coded by the retailer)
+	column Format
+		dataType: string
+		lineageTag: 46cdaa3b-0b50-42ef-9377-8aa87a0f0b64
+		summarizeBy: none
+		sourceColumn: Format
+
+	/// Basic, Extra or Extended range
+	column Assortment
+		dataType: string
+		lineageTag: a78b5a60-3653-459d-b056-ddcc87bb83a7
+		summarizeBy: none
+		sourceColumn: Assortment
+
+	/// Metres to nearest competitor; -1 = not recorded
+	column CompetitionDistance
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: 6af42ef3-92e2-4149-a10b-9b99b00144cf
+		summarizeBy: none
+		sourceColumn: CompetitionDistance
+
+	/// Distance to the nearest competitor
+	column CompetitionBand
+		dataType: string
+		lineageTag: 66bdb6ce-53f5-4981-964b-ae48e7317b13
+		summarizeBy: none
+		sourceColumn: CompetitionBand
+		sortByColumn: CompetitionBandOrder
+
+	column CompetitionBandOrder
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: a085579d-f722-4e0f-8d2a-8a65e59cdda4
+		summarizeBy: none
+		sourceColumn: CompetitionBandOrder
+
+	/// Takes part in the continuous loyalty promotion
+	column LoyaltyPromo
+		dataType: string
+		lineageTag: 4aeaf98d-5fa3-4d92-ba3e-6c7e05af36eb
+		summarizeBy: none
+		sourceColumn: LoyaltyPromo
+
+	partition Store = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("dim_store.csv"),
+				    Typed = Table.TransformColumnTypes(Source, {{"StoreKey", Int64.Type}, {"StoreName", type text}, {"State", type text}, {"StateName", type text}, {"StateGeo", type text}, {"Format", type text}, {"Assortment", type text}, {"CompetitionDistance", Int64.Type}, {"CompetitionBand", type text}, {"CompetitionBandOrder", Int64.Type}, {"LoyaltyPromo", type text}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

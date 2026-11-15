@@ -1,0 +1,20 @@
+relationship a0256686-40d6-5819-9a9f-7f20fb015669
+	fromColumn: 'Store Day'.StoreKey
+	toColumn: Store.StoreKey
+
+relationship 9ad2f783-1ac9-502b-a1bb-f6ea0b6fddd2
+	fromColumn: 'Store Day'.Date
+	toColumn: Date.Date
+
+relationship b30dd537-1eb9-5fe4-a3bf-64470df9f85c
+	fromColumn: 'Competition Event'.StoreKey
+	toColumn: Store.StoreKey
+
+relationship c39adf4a-05b4-5871-ac4d-47bf8ccf6976
+	fromColumn: Forecast.StoreKey
+	toColumn: Store.StoreKey
+
+relationship f6f64817-023e-51ed-ba41-3ead4b3d8a87
+	fromColumn: Forecast.Date
+	toColumn: Date.Date
+

@@ -1,0 +1,127 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/2.1.0/schema.json",
+  "displayName": "Filters - close (Calendar & staffing)",
+  "name": "393364607a0028eae698",
+  "options": {
+    "targetVisualNames": [
+      "217945f9932bd2583e98",
+      "cc12d4ae3ee7036896fc",
+      "7f943782981f36187b3f",
+      "8eb3323d27ae80034725",
+      "31ad6318b92e91b0acb7",
+      "34392167ea44ac802615",
+      "0210f60f9da9f8a90d76",
+      "b9dfa45105aad2aa9d7c",
+      "f292e724b4e31a05c2e4",
+      "cb79b35f878ebad6a834",
+      "624613358a92974b16c9",
+      "1b9f71d593410efdd065"
+    ],
+    "applyOnlyToTargetVisuals": true,
+    "suppressData": true,
+    "suppressActiveSection": true
+  },
+  "explorationState": {
+    "version": "1.3",
+    "activeSection": "3a559bc159b3e1751b0b",
+    "sections": {
+      "3a559bc159b3e1751b0b": {
+        "visualContainers": {
+          "cc12d4ae3ee7036896fc": {
+            "singleVisual": {
+              "visualType": "shape",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "7f943782981f36187b3f": {
+            "singleVisual": {
+              "visualType": "shape",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "8eb3323d27ae80034725": {
+            "singleVisual": {
+              "visualType": "shape",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "31ad6318b92e91b0acb7": {
+            "singleVisual": {
+              "visualType": "shape",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "34392167ea44ac802615": {
+            "singleVisual": {
+              "visualType": "textbox",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "0210f60f9da9f8a90d76": {
+            "singleVisual": {
+              "visualType": "advancedSlicerVisual",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "b9dfa45105aad2aa9d7c": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "f292e724b4e31a05c2e4": {
+            "singleVisual": {
+              "visualType": "advancedSlicerVisual",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "cb79b35f878ebad6a834": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "624613358a92974b16c9": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "1b9f71d593410efdd065": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          }
+        },
+        "visualContainerGroups": {
+          "217945f9932bd2583e98": {
+            "isHidden": true
+          }
+        }
+      }
+    }
+  }
+}

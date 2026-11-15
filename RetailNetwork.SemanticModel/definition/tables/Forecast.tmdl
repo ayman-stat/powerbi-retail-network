@@ -1,0 +1,57 @@
+/// Fact: 6-week backtest (19 Jun - 31 Jul 2015) of the gradient-boosting forecast and a naive baseline, per open store-day.
+table Forecast
+	lineageTag: f9b6022b-f05b-41a2-bb13-74da5065b4a7
+
+	column StoreKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 54d25e8a-c9c5-480c-91c2-c85c7fac0313
+		summarizeBy: none
+		sourceColumn: StoreKey
+
+	column Date
+		dataType: dateTime
+		isHidden
+		formatString: dd mmm yyyy
+		lineageTag: 788f2835-74a6-480e-b641-916de5d8a826
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Actual
+		dataType: double
+		isHidden
+		formatString: #,0
+		lineageTag: 5d088c17-7de4-4089-9514-fe39aefb70ea
+		summarizeBy: none
+		sourceColumn: Actual
+
+	column Forecast
+		dataType: double
+		isHidden
+		formatString: #,0
+		lineageTag: 426296b3-b5f3-4de8-8af3-6b0e3c58fd7d
+		summarizeBy: none
+		sourceColumn: Forecast
+
+	column Baseline
+		dataType: double
+		isHidden
+		formatString: #,0
+		lineageTag: ab7f8331-36d5-430f-8f65-668d9e59751a
+		summarizeBy: none
+		sourceColumn: Baseline
+
+	partition Forecast = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("fact_forecast.csv"),
+				    Typed = Table.TransformColumnTypes(Source, {{"StoreKey", Int64.Type}, {"Date", type date}, {"Actual", type number}, {"Forecast", type number}, {"Baseline", type number}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

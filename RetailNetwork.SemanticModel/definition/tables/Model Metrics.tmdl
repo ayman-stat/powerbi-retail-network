@@ -1,0 +1,29 @@
+table 'Model Metrics'
+	isHidden
+	lineageTag: 50e0da12-6e25-40d6-b053-3887c8542f48
+
+	column Metric
+		dataType: string
+		lineageTag: 9c6e3053-884d-45a7-acfc-24466b32cc4c
+		summarizeBy: none
+		sourceColumn: Metric
+
+	column Value
+		dataType: double
+		isHidden
+		formatString: 0.####
+		lineageTag: 28eebc80-ee30-4251-8971-f6de42ec905e
+		summarizeBy: none
+		sourceColumn: Value
+
+	partition 'Model Metrics' = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("model_metrics.csv"),
+				    Typed = Table.TransformColumnTypes(Source, {{"Metric", type text}, {"Value", type number}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

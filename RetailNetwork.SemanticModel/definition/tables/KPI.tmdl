@@ -1,0 +1,273 @@
+/// All report measures, organised in display folders.
+table KPI
+	lineageTag: 72c900fb-bb5c-4eb2-ad58-92217d2237cf
+
+	/// Net sales, EUR.
+	measure Sales = SUM('Store Day'[Sales])
+		formatString: €#,0
+		displayFolder: 1 Sales
+		lineageTag: b1599f9f-f336-4ece-a4ea-56d8bba9ed2e
+
+	/// Transactions (footfall proxy).
+	measure Customers = SUM('Store Day'[Customers])
+		formatString: #,0
+		displayFolder: 1 Sales
+		lineageTag: 764f47e4-161d-40de-8e4a-e35100a8043b
+
+	/// Average transaction value.
+	measure 'Avg Ticket' = DIVIDE([Sales], [Customers])
+		formatString: €0.00
+		displayFolder: 1 Sales
+		lineageTag: afbe83b6-a9dc-405f-b44a-fb146172ecb7
+
+	/// Open store-days.
+	measure 'Store Days' = COUNTROWS('Store Day')
+		formatString: #,0
+		displayFolder: 1 Sales
+		lineageTag: 680384de-63c7-46d5-adfa-d9215cc39174
+
+	/// Average daily sales of an open store: the like-for-like productivity measure.
+	measure 'Sales per Store Day' = DIVIDE([Sales], [Store Days])
+		formatString: €#,0
+		displayFolder: 1 Sales
+		lineageTag: bbdf2fbb-9333-4b26-9a9c-4741f8808328
+
+	measure 'Customers per Store Day' = DIVIDE([Customers], [Store Days])
+		formatString: #,0
+		displayFolder: 1 Sales
+		lineageTag: 22aaf400-f9db-47cf-a727-98c9e328585e
+
+	measure 'Trading Stores' = DISTINCTCOUNT('Store Day'[StoreKey])
+		formatString: #,0
+		displayFolder: 1 Sales
+		lineageTag: cd1ab6d6-95df-4019-b546-14797ee4dc5e
+
+	measure 'Sales LY' = CALCULATE([Sales], SAMEPERIODLASTYEAR('Date'[Date]))
+		formatString: €#,0
+		displayFolder: 1 Sales
+		lineageTag: 064c10cc-8d16-4010-b02d-c7e7e552167b
+
+	/// Sales of store-months that also traded in the same month last year.
+	measure 'LFL Sales' =
+			SUMX(CROSSJOIN(VALUES('Store'[StoreKey]), VALUES('Date'[Year Month Sort])),
+			    VAR _s = [Sales] VAR _ly = [Sales LY] RETURN IF(_s > 0 && _ly > 0, _s))
+		formatString: €#,0
+		displayFolder: 1 Sales
+		lineageTag: 37f0c210-d6c2-4cfb-a228-6ecd779dc145
+
+	measure 'LFL Sales LY' =
+			SUMX(CROSSJOIN(VALUES('Store'[StoreKey]), VALUES('Date'[Year Month Sort])),
+			    VAR _s = [Sales] VAR _ly = [Sales LY] RETURN IF(_s > 0 && _ly > 0, _ly))
+		formatString: €#,0
+		displayFolder: 1 Sales
+		lineageTag: b2be14a4-8096-4106-9b62-1032e9cec5af
+
+	/// Like-for-like sales growth: same stores, same months, this year vs last.
+	measure 'LFL Growth' = DIVIDE([LFL Sales], [LFL Sales LY]) - 1
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 1 Sales
+		lineageTag: 47800a2f-4f72-4ca1-ae88-9eb40bdd6c2f
+
+	measure 'Customers LY' = CALCULATE([Customers], SAMEPERIODLASTYEAR('Date'[Date]))
+		formatString: #,0
+		displayFolder: 1 Sales
+		lineageTag: 1d8eecb6-26b0-4c46-830b-1d73d9e877ce
+
+	measure 'LFL Footfall Growth' =
+			VAR _t = SUMX(CROSSJOIN(VALUES('Store'[StoreKey]), VALUES('Date'[Year Month Sort])),
+			    VAR _c = [Customers] VAR _ly = [Customers LY] RETURN IF(_c > 0 && _ly > 0, _c))
+			VAR _l = SUMX(CROSSJOIN(VALUES('Store'[StoreKey]), VALUES('Date'[Year Month Sort])),
+			    VAR _c = [Customers] VAR _ly = [Customers LY] RETURN IF(_c > 0 && _ly > 0, _ly))
+			RETURN DIVIDE(_t, _l) - 1
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 1 Sales
+		lineageTag: 41e96119-1645-4c8d-92c6-06f9dba08f19
+
+	measure 'Share of Sales' = DIVIDE([Sales], CALCULATE([Sales], ALLSELECTED('Store')))
+		formatString: 0.0%
+		displayFolder: 2 Stores
+		lineageTag: 0b202561-ae22-4ba1-80e3-37e28f3e94aa
+
+	/// Rank by sales per open day within the current selection.
+	measure 'Store Rank' = IF(HASONEVALUE('Store'[StoreKey]), RANKX(ALLSELECTED('Store'), [Sales per Store Day]))
+		formatString: 0
+		displayFolder: 2 Stores
+		lineageTag: 93ac0c77-3f23-4678-8b7d-1b48ed23ee45
+
+	/// Share of sales from the top 10% of stores.
+	measure 'Top Decile Sales Share' =
+			VAR _n = DISTINCTCOUNT('Store'[StoreKey])
+			VAR _top = TOPN(ROUNDUP(_n / 10, 0), VALUES('Store'[StoreKey]), [Sales], DESC)
+			RETURN DIVIDE(CALCULATE([Sales], _top), [Sales])
+		formatString: 0%
+		displayFolder: 2 Stores
+		lineageTag: 8cb3473c-8604-4be3-bf51-b408bdbf6991
+
+	/// Weekday-matched: promo vs regular days, Monday to Friday only (promotions never run at weekends).
+	measure 'Promo Sales Uplift' =
+			AVERAGEX(FILTER(VALUES('Date'[Weekday Number]), 'Date'[Weekday Number] <= 5),
+			    DIVIDE(CALCULATE([Sales per Store Day], 'Store Day'[Promo] = 1), CALCULATE([Sales per Store Day], 'Store Day'[Promo] = 0)) - 1)
+		formatString: +0.0%;-0.0%
+		displayFolder: 3 Promotions
+		lineageTag: a3f4d026-4add-4d51-b43b-5380b5e6a0ba
+
+	/// Weekday-matched change in transactions on promo days.
+	measure 'Promo Traffic Uplift' =
+			AVERAGEX(FILTER(VALUES('Date'[Weekday Number]), 'Date'[Weekday Number] <= 5),
+			    DIVIDE(CALCULATE([Customers per Store Day], 'Store Day'[Promo] = 1), CALCULATE([Customers per Store Day], 'Store Day'[Promo] = 0)) - 1)
+		formatString: +0.0%;-0.0%
+		displayFolder: 3 Promotions
+		lineageTag: ec007f52-719e-42ae-aa8c-5b9be7bde84e
+
+	/// Weekday-matched change in average ticket on promo days.
+	measure 'Promo Ticket Uplift' =
+			AVERAGEX(FILTER(VALUES('Date'[Weekday Number]), 'Date'[Weekday Number] <= 5),
+			    DIVIDE(CALCULATE([Avg Ticket], 'Store Day'[Promo] = 1), CALCULATE([Avg Ticket], 'Store Day'[Promo] = 0)) - 1)
+		formatString: +0.0%;-0.0%
+		displayFolder: 3 Promotions
+		lineageTag: 72ea4f1c-066a-406d-8886-9caad0ce88d2
+
+	measure 'Promo Day Share' = DIVIDE(CALCULATE([Store Days], 'Store Day'[Promo] = 1), [Store Days])
+		formatString: 0%
+		displayFolder: 3 Promotions
+		lineageTag: ec1fd622-4fcd-47a0-b417-65130d705261
+
+	measure 'Promo Sales per Store Day' = CALCULATE([Sales per Store Day], 'Store Day'[Promo] = 1)
+		formatString: €#,0
+		displayFolder: 3 Promotions
+		lineageTag: 8c8f9a10-6c86-4e88-9aea-63fa64e2c1d3
+
+	/// Monday-Friday regular days, comparable with promo days.
+	measure 'Regular Sales per Store Day' = CALCULATE([Sales per Store Day], 'Store Day'[Promo] = 0, 'Date'[Weekday Number] <= 5)
+		formatString: €#,0
+		displayFolder: 3 Promotions
+		lineageTag: 52b8e51c-85c5-439a-8330-88a7c1a8b24a
+
+	/// Loyalty-promo stores: sales per day in promotion months vs other months (not seasonally adjusted).
+	measure 'Loyalty Month Effect' =
+			DIVIDE(CALCULATE([Sales per Store Day], 'Store Day'[LoyaltyPromoMonth] = 1, 'Store'[LoyaltyPromo] = "Loyalty promo"),
+			       CALCULATE([Sales per Store Day], 'Store Day'[LoyaltyPromoMonth] = 0, 'Store'[LoyaltyPromo] = "Loyalty promo")) - 1
+		formatString: +0.0%;-0.0%
+		displayFolder: 3 Promotions
+		lineageTag: 90031244-f24a-4d09-bca6-9f9a5c4e06ee
+
+	measure 'Competition Events' = COUNTROWS('Competition Event')
+		formatString: #,0
+		displayFolder: 4 Competition
+		lineageTag: a8ad6d50-3192-4e6b-9da3-eb307dee6351
+
+	/// Median sales impact of a competitor opening (difference in differences vs the network).
+	measure 'Median Competition Impact' = MEDIAN('Competition Event'[ImpactPct])
+		formatString: +0.0%;-0.0%
+		displayFolder: 4 Competition
+		lineageTag: 09c9c8b5-e397-45c6-8d93-90436137b9c1
+
+	measure 'Share of Events Losing 10%+' = DIVIDE(CALCULATE(COUNTROWS('Competition Event'), 'Competition Event'[ImpactPct] <= -0.1), [Competition Events])
+		formatString: 0%
+		displayFolder: 4 Competition
+		lineageTag: 2898766c-c727-458f-93b6-767fb9254327
+
+	measure 'Avg Pre Sales' = AVERAGE('Competition Event'[PreDailySales])
+		formatString: €#,0
+		displayFolder: 4 Competition
+		lineageTag: ebc8a5f6-250a-4a3d-86e8-c960e8a49ecc
+
+	measure 'Avg Post Sales' = AVERAGE('Competition Event'[PostDailySales])
+		formatString: €#,0
+		displayFolder: 4 Competition
+		lineageTag: 68a33ca9-0f2f-4a9f-ae06-14b6979c14d8
+
+	measure 'Avg Impact' = AVERAGE('Competition Event'[ImpactPct])
+		formatString: +0.0%;-0.0%
+		displayFolder: 4 Competition
+		lineageTag: cc4a2d52-135a-409c-a2ae-209ffcb9a39c
+
+	/// Stores with a competitor under 500 m.
+	measure 'Near Competitor Share' =
+			DIVIDE(CALCULATE(DISTINCTCOUNT('Store'[StoreKey]), 'Store'[CompetitionDistance] >= 0, 'Store'[CompetitionDistance] < 500),
+			       DISTINCTCOUNT('Store'[StoreKey]))
+		formatString: 0%
+		displayFolder: 4 Competition
+		lineageTag: f9c544fe-5bff-42e0-9e8a-26017c0d1aab
+
+	measure 'School Holiday Uplift' = DIVIDE(CALCULATE([Sales per Store Day], 'Store Day'[SchoolHoliday] = 1), CALCULATE([Sales per Store Day], 'Store Day'[SchoolHoliday] = 0)) - 1
+		formatString: +0.0%;-0.0%
+		displayFolder: 5 Calendar
+		lineageTag: 3a0fc699-b706-4407-81d0-2319fb018bcd
+
+	measure 'Sunday Store Days' = CALCULATE([Store Days], 'Date'[Weekday Number] = 7)
+		formatString: #,0
+		displayFolder: 5 Calendar
+		lineageTag: f66d6a5c-0839-46ee-9f88-213e5c24aaf7
+
+	/// Busiest vs quietest Monday-Saturday footfall: the staffing swing.
+	measure 'Peak to Trough Weekday' =
+			VAR _t = ADDCOLUMNS(FILTER(VALUES('Date'[Weekday Number]), 'Date'[Weekday Number] <= 6), "@v", [Customers per Store Day])
+			RETURN DIVIDE(MAXX(_t, [@v]), MINX(_t, [@v])) - 1
+		formatString: +0%
+		displayFolder: 5 Calendar
+		lineageTag: d4b1da06-9e18-4476-b246-d304a2aab6a0
+
+	measure 'FC Actual' = SUM('Forecast'[Actual])
+		formatString: €#,0
+		displayFolder: 6 Forecast
+		lineageTag: 5d45b87a-0201-4e4b-9079-fec48c03ba26
+
+	measure 'FC Forecast' = SUM('Forecast'[Forecast])
+		formatString: €#,0
+		displayFolder: 6 Forecast
+		lineageTag: 7f66f3bc-d490-44a9-9aa1-2171fda9d52a
+
+	measure 'FC Baseline' = SUM('Forecast'[Baseline])
+		formatString: €#,0
+		displayFolder: 6 Forecast
+		lineageTag: 862ace6b-935d-459f-b728-ff5ff0f082e5
+
+	/// Mean absolute percentage error per store-day.
+	measure 'Forecast MAPE' = AVERAGEX('Forecast', DIVIDE(ABS('Forecast'[Forecast] - 'Forecast'[Actual]), 'Forecast'[Actual]))
+		formatString: 0.0%
+		displayFolder: 6 Forecast
+		lineageTag: 9a601f45-0c89-46ce-a2ec-dcd78932541c
+
+	/// Naive baseline: same store, weekday and promo state, median of the previous 8 weeks.
+	measure 'Baseline MAPE' = AVERAGEX('Forecast', DIVIDE(ABS('Forecast'[Baseline] - 'Forecast'[Actual]), 'Forecast'[Actual]))
+		formatString: 0.0%
+		displayFolder: 6 Forecast
+		lineageTag: e89813e2-fe51-4094-bdfc-c638e0c932b9
+
+	measure 'Error Reduction' = 1 - DIVIDE([Forecast MAPE], [Baseline MAPE])
+		formatString: 0%
+		displayFolder: 6 Forecast
+		lineageTag: b7451058-1025-4dbc-b69f-11da735bb85c
+
+	/// Root mean square percentage error (the Kaggle competition metric).
+	measure 'Forecast RMSPE' = SQRT(AVERAGEX('Forecast', DIVIDE('Forecast'[Actual] - 'Forecast'[Forecast], 'Forecast'[Actual]) ^ 2))
+		formatString: 0.000
+		displayFolder: 6 Forecast
+		lineageTag: 7120d0a9-f26c-4b2a-a422-9762f51d2e05
+
+	measure 'Forecast Bias' = DIVIDE([FC Forecast], [FC Actual]) - 1
+		formatString: +0.0%;-0.0%
+		displayFolder: 6 Forecast
+		lineageTag: 2af239de-1586-4ed3-addc-32e443194fe2
+
+	/// Breadcrumb of the filter-panel selections.
+	measure 'Filter Summary' =
+			VAR _y = IF(ISFILTERED('Date'[Year]), CONCATENATEX(VALUES('Date'[Year]), 'Date'[Year], ", "), "All years")
+			VAR _s = IF(ISFILTERED('Store'[StateName]), IF(COUNTROWS(VALUES('Store'[StateName])) = 1, VALUES('Store'[StateName]), COUNTROWS(VALUES('Store'[StateName])) & " states"), "All states")
+			VAR _f = IF(ISFILTERED('Store'[Format]), CONCATENATEX(VALUES('Store'[Format]), 'Store'[Format], ", "), "All formats")
+			RETURN _y & "  ·  " & _s & "  ·  " & _f
+		displayFolder: 9 Report UI
+		lineageTag: 910660b5-159e-4839-8568-f1b84d51d9c2
+
+	column Value
+		dataType: string
+		isHidden
+		lineageTag: ee058d28-22d0-4f50-9767-6a12ad79484d
+		summarizeBy: none
+		sourceColumn: [Value]
+
+	partition KPI = calculated
+		mode: import
+		source = {BLANK()}
+

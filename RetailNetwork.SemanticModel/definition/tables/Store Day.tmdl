@@ -1,0 +1,96 @@
+/// Fact: one row per open store-day (844,338 rows). Sales in EUR; Customers = transactions (footfall).
+table 'Store Day'
+	lineageTag: 2c160d62-4a5c-4ab0-bd71-3266541fd656
+
+	column StoreKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 6c039859-99f8-4e99-91d0-9396da9f6cb1
+		summarizeBy: none
+		sourceColumn: StoreKey
+
+	column Date
+		dataType: dateTime
+		isHidden
+		formatString: dd mmm yyyy
+		lineageTag: 66e7f985-bc63-41bc-9aef-24e2fa331c93
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Sales
+		dataType: double
+		isHidden
+		formatString: #,0
+		lineageTag: 48601c49-581e-42ae-8205-27c7b3f2aebf
+		summarizeBy: none
+		sourceColumn: Sales
+
+	column Customers
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: d6d3b433-d6d0-4f14-af39-d742fc89044a
+		summarizeBy: none
+		sourceColumn: Customers
+
+	column Promo
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e8941da4-127b-4ca8-b2b8-3ebf527446d1
+		summarizeBy: none
+		sourceColumn: Promo
+
+	column SchoolHoliday
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 96efca4a-c3e3-418f-9a3e-8dcecbb1bbdf
+		summarizeBy: none
+		sourceColumn: SchoolHoliday
+
+	/// Public holiday type on the day
+	column StateHoliday
+		dataType: string
+		lineageTag: 8c004008-503c-4d36-bb6b-ed93df67b76a
+		summarizeBy: none
+		sourceColumn: StateHoliday
+
+	column LoyaltyPromoMonth
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 734081f1-eade-4fd3-8384-5795700f9738
+		summarizeBy: none
+		sourceColumn: LoyaltyPromoMonth
+
+	/// Store ran its short-term promotion that day
+	column 'Promo Day'
+		dataType: string
+		lineageTag: 23c2f9c0-5b77-4bfe-8300-0369feca8bae
+		summarizeBy: none
+		sourceColumn: Promo Day
+
+	column 'School Holiday'
+		dataType: string
+		lineageTag: 46a80e32-8b37-4504-9cbe-46bb65577bfb
+		summarizeBy: none
+		sourceColumn: School Holiday
+
+	partition 'Store Day' = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("fact_store_day.csv"),
+				    Typed = Table.TransformColumnTypes(Source, {{"StoreKey", Int64.Type}, {"Date", type date}, {"Sales", type number}, {"Customers", Int64.Type}, {"Promo", Int64.Type}, {"SchoolHoliday", Int64.Type}, {"StateHoliday", type text}, {"LoyaltyPromoMonth", Int64.Type}}, "en-US"),
+				    Result = Table.AddColumn(Table.AddColumn(Typed,
+				        "Promo Day", each if [Promo] = 1 then "Promo day" else "Regular day", type text),
+				        "School Holiday", each if [SchoolHoliday] = 1 then "School holiday" else "School term", type text)
+				in
+				    Result
+
+	annotation PBI_ResultType = Table
+

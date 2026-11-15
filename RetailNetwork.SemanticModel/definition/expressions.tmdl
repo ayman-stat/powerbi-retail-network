@@ -1,0 +1,28 @@
+/// Where the CSVs are read from: "GitHub" (public raw files, no setup) or "Local" (LocalDataFolder).
+expression DataSource = "Local" meta [IsParameterQuery=true, List={"GitHub", "Local"}, DefaultValue="GitHub", Type="Text", IsParameterQueryRequired=true]
+	lineageTag: d8525d6e-b2c0-4998-a9c9-ca0127ecfaa5
+
+	annotation PBI_ResultType = Text
+
+/// Folder holding the CSVs when DataSource = "Local". Must end with a backslash.
+expression LocalDataFolder = "D:\03_Projects\pbi\powerbi-retail-network\data\" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: dd8d4520-3cda-4b3f-819a-f7b3500eef0a
+
+	annotation PBI_ResultType = Text
+
+/// Loads one CSV from the repo's data/ folder. The GitHub branch uses a static base URL + RelativePath,
+/// so the Power BI Service can refresh it without a gateway.
+expression fnLoadCsv =
+		(file as text) as table =>
+		let
+		    Bytes = if DataSource = "Local"
+		        then File.Contents(LocalDataFolder & file)
+		        else Web.Contents("https://raw.githubusercontent.com", [RelativePath = "ayman-stat/powerbi-retail-network/main/data/" & file]),
+		    Csv = Csv.Document(Bytes, [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+		    Promoted = Table.PromoteHeaders(Csv, [PromoteAllScalars = true])
+		in
+		    Promoted
+	lineageTag: 90d77280-d1dc-4a80-bf8c-a854d2114d7f
+
+	annotation PBI_ResultType = Function
+

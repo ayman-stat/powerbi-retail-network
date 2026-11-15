@@ -1,0 +1,97 @@
+/// Calendar Jan 2013 - Jul 2015 (the full data range).
+table Date
+	lineageTag: 5ba9e9a0-e1ca-4e09-9027-fb613ee3203a
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: dd mmm yyyy
+		lineageTag: 08f5a1fd-1959-489a-948c-803831f653ca
+		summarizeBy: none
+		sourceColumn: [Date]
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 05f2fe19-c771-40d4-b754-0deef75e424a
+		summarizeBy: none
+		sourceColumn: [Year]
+
+	column Half
+		dataType: string
+		lineageTag: a164cb18-0318-407f-888f-f34780c25ea3
+		summarizeBy: none
+		sourceColumn: [Half]
+
+	column Month
+		dataType: string
+		lineageTag: a31cf999-3d99-47f4-a4ec-1d98538595f6
+		summarizeBy: none
+		sourceColumn: [Month]
+		sortByColumn: 'Month Number'
+
+	column 'Month Number'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: c2a12fc3-3ea3-4c4a-9738-5f49f3653ae0
+		summarizeBy: none
+		sourceColumn: [Month Number]
+
+	column 'Year Month'
+		dataType: string
+		lineageTag: 5c91d0d0-0e35-418c-8c67-f60b0db6db80
+		summarizeBy: none
+		sourceColumn: [Year Month]
+		sortByColumn: 'Year Month Sort'
+
+	column 'Year Month Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 78957216-aa01-4916-9655-ab9917e0d784
+		summarizeBy: none
+		sourceColumn: [Year Month Sort]
+
+	column 'Month Start'
+		dataType: dateTime
+		formatString: mmm yyyy
+		lineageTag: e36b381b-cc46-442d-bc46-abda53eed7bb
+		summarizeBy: none
+		sourceColumn: [Month Start]
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Weekday
+		dataType: string
+		lineageTag: 87f796be-90a3-42ac-9444-f7b0e64cb401
+		summarizeBy: none
+		sourceColumn: [Weekday]
+		sortByColumn: 'Weekday Number'
+
+	column 'Weekday Number'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0ce3169a-6ee1-4989-b37b-34218072eb05
+		summarizeBy: none
+		sourceColumn: [Weekday Number]
+
+	partition Date = calculated
+		mode: import
+		source =
+				ADDCOLUMNS(
+				    CALENDAR(DATE(2013, 1, 1), DATE(2015, 7, 31)),
+				    "Year", YEAR([Date]),
+				    "Half", "H" & IF(MONTH([Date]) <= 6, 1, 2),
+				    "Month", FORMAT([Date], "MMM"),
+				    "Month Number", MONTH([Date]),
+				    "Year Month", FORMAT([Date], "MMM yy"),
+				    "Year Month Sort", YEAR([Date]) * 100 + MONTH([Date]),
+				    "Month Start", DATE(YEAR([Date]), MONTH([Date]), 1),
+				    "Weekday", FORMAT([Date], "ddd"),
+				    "Weekday Number", WEEKDAY([Date], 2))
+
