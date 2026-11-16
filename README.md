@@ -1,5 +1,7 @@
 # Retail Network Performance
 
+[![ci](https://github.com/ayman-stat/powerbi-retail-network/actions/workflows/ci.yml/badge.svg)](https://github.com/ayman-stat/powerbi-retail-network/actions/workflows/ci.yml)
+
 Like-for-like growth, store league tables, promotion and competition effects, staffing patterns and a six-week sales forecast for a 1,115-store drugstore chain.
 
 **Domain:** Retail / store operations  ·  **Built with:** Power BI Desktop (PBIP, PBIR, TMDL), DAX, Python  ·  **Author:** [Mohamed Ayman](https://mohamedaymanstat.vercel.app)
