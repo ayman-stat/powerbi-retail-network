@@ -1,0 +1,177 @@
+{
+  "01_eda": {
+    "raw_store_days": 1017209,
+    "open_store_days": 844338,
+    "stores": 1115,
+    "stores_with_h2_2014_gap": 180,
+    "open_zero_sales_days": 54,
+    "weekday_footfall_swing": 0.295755,
+    "lfl_growth_2015": 0.033004,
+    "promo_uplift_naive": 0.385733,
+    "promo_traffic_naive": 0.196023,
+    "promo_ticket_naive": 0.156537,
+    "variance_share_store": 0.570964,
+    "variance_share_store_dow_promo": 0.855436
+  },
+  "02_forecast": {
+    "holdout_rmspe_champion": 0.110239,
+    "holdout_rmspe_challenger": 0.111443,
+    "holdout_rmspe_naive_etl": 0.148026,
+    "holdout_rmspe_naive_honest": 0.148026,
+    "holdout_mape_champion": 0.079251,
+    "holdout_bias_champion": -0.006036,
+    "folds_rmspe_champion": [
+      0.1644,
+      0.1045,
+      0.1026,
+      0.1102
+    ],
+    "folds_rmspe_challenger": [
+      0.1559,
+      0.1045,
+      0.1026,
+      0.1114
+    ],
+    "folds_rmspe_naive_honest": [
+      0.2066,
+      0.1737,
+      0.1473,
+      0.148
+    ],
+    "folds_rmspe_profile_mean": [
+      0.1873,
+      0.1716,
+      0.1539,
+      0.1446
+    ],
+    "folds_rmspe_seasonal_naive": [
+      0.2408,
+      0.2993,
+      0.314,
+      0.3427
+    ],
+    "pooled_rmspe_gain_challenger": {
+      "diff": 0.002559,
+      "ci_low": 0.001392,
+      "ci_high": 0.00386
+    },
+    "winner": "champion",
+    "random_split_rmspe_same_days": 0.094981,
+    "out_of_time_rmspe_same_stores": 0.10021,
+    "interval_coverage_quantile": 0.746232,
+    "interval_coverage_residual": 0.761644,
+    "interval_width_quantile": 0.222616,
+    "interval_width_residual": 0.240212,
+    "staff_hours_saved_6wk_at_125": 63465.019799,
+    "wape_champion_folds": [
+      0.0777,
+      0.0812,
+      0.0749,
+      0.0772
+    ],
+    "bias_champion_folds": [
+      -0.0329,
+      -0.0375,
+      -0.0239,
+      -0.006
+    ],
+    "rmspe_top10_share_folds": [
+      0.28,
+      0.047,
+      0.084,
+      0.088
+    ],
+    "top_shap_features": [
+      "Store x weekday x promo mean",
+      "Public holiday",
+      "Store x month mean",
+      "Store mean (log)",
+      "Week of year"
+    ],
+    "challenger_params": {
+      "subsample_freq": 1,
+      "random_state": 42,
+      "verbose": -1,
+      "n_jobs": 4,
+      "num_leaves": 56,
+      "min_child_samples": 36,
+      "subsample": 0.805694,
+      "colsample_bytree": 0.796207,
+      "reg_lambda": 0.001584,
+      "n_estimators": 300,
+      "learning_rate": 0.1
+    },
+    "runtime_seconds": 400.758648
+  },
+  "03_causal": {
+    "promo_naive": {
+      "sales": 0.385733,
+      "traffic": 0.196023,
+      "ticket": 0.156537
+    },
+    "promo_fe_sales": {
+      "naive": 0.385733,
+      "fixed effects": 0.390981,
+      "CI low": 0.368571,
+      "CI high": 0.413758
+    },
+    "promo_fe_traffic": {
+      "naive": 0.196023,
+      "fixed effects": 0.207811,
+      "CI low": 0.193347,
+      "CI high": 0.222451
+    },
+    "promo_fe_ticket": {
+      "naive": 0.156537,
+      "fixed effects": 0.151654,
+      "CI low": 0.145431,
+      "CI high": 0.157912
+    },
+    "promo_spec_table": {
+      "1. Store FE only": 0.393238,
+      "2. + weekday": 0.391002,
+      "3. + year-month": 0.391148,
+      "4. + day of month": 0.37322,
+      "5. + holiday controls": 0.390981
+    },
+    "promo_se": {
+      "naive (independent store-days)": 0.000405,
+      "clustered by store": 0.002681,
+      "clustered by week (assignment unit)": 0.008212
+    },
+    "promo_post_week": 0.014562,
+    "loyalty_raw": -0.019087,
+    "loyalty_fe_all": -0.002597,
+    "loyalty_fe_ci": [
+      -0.005058,
+      -0.00013
+    ],
+    "etl_events": 131,
+    "etl_median_impact": -0.067973,
+    "etl_share_losing_10": 0.343511,
+    "es_events": 131,
+    "es_median_impact": -0.062062,
+    "es_mean_impact": -0.078975,
+    "es_mean_ci": [
+      -0.098188,
+      -0.059924
+    ],
+    "es_share_losing_10": 0.312977,
+    "pretrend_max_abs_lead": 0.00804,
+    "placebo_median": 0.000655,
+    "placebo_95": [
+      -0.006937,
+      0.006539
+    ],
+    "placebo_p": 0.003322,
+    "placebo_shift_52w_median": 0.003554,
+    "impact_by_distance": {
+      "Under 0.5 km": -0.161666,
+      "0.5-2 km": -0.086326,
+      "2-5 km": -0.063027,
+      "5-15 km": -0.017675,
+      "15 km+": -0.005114
+    },
+    "runtime_seconds": 101.577891
+  }
+}

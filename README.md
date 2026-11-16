@@ -39,6 +39,16 @@ Like-for-like growth, store league tables, promotion and competition effects, st
 - Backtest: trained to 18 Jun 2015, tested on 19 Jun - 31 Jul 2015 (the Kaggle horizon); RMSPE 0.110 vs 0.148 for the baseline.
 - Competition: difference-in-differences event study on 131 competitor openings.
 
+## Data science
+
+Three notebooks reproduce the report's forecast and causal numbers exactly, then test them harder ([ds/README](ds/README.md), [model card](ds/model_card.md)):
+
+- [01 · EDA and time series](ds/notebooks/01_eda_time_series.ipynb): data audit, seasonality (weekday, payday, Christmas), STL and autocorrelation.
+- [02 · Forecast model](ds/notebooks/02_forecast_model.ipynb): a four-fold rolling-origin backtest. The published model beats every baseline in every fold (MAPE 7.7-8.2% vs 10.3-12.2%) and a tuned LightGBM challenger does not beat it. Also covers error analysis, P10-P90 intervals, SHAP and staff-hours.
+- [03 · Causal effects](ds/notebooks/03_causal_effects.ipynb):
+  - Promotions: +39% (95% CI +37% to +41%) with fixed effects and week-clustered errors.
+  - Competitor openings: −7.9% (95% CI −9.8% to −6.0%) in an event study with flat pre-trends, placebo tests and a distance dose-response.
+
 ## Design
 
 - Identity: **Retail**: warm white, orange and charcoal, underline-tab navigation, soft card shadows, and a slide-in filter panel on every page.
